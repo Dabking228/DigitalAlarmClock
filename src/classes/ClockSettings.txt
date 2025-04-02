@@ -1,0 +1,2 @@
+isTimeDefault/is12HourFormat/isDefaultSnoozingTime/snoozingTime
+true/true/true/120000
