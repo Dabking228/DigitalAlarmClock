@@ -1,10 +1,13 @@
 package classes;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
 
 public class Time {
@@ -119,53 +122,93 @@ public class Time {
 		Time.isDefaultSnoozingTime = isDefaultSnoozingTime;
 	}
 	
+	public void createClockSettingsFile(){
+		File file = new File("src/classes/ClockSettings.txt");
+		if(file.exists()){
+			System.out.println("ClockSettings.txt already exists");
+			return;
+		}
+		
+		try{
+			file.createNewFile();
+			System.out.println("ClockSettings.txt has been created successfully");
+			FileWriter fw = new FileWriter(file);
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write("isTimeDefault/is12HourFormat/isDefaultSnoozingTime/snoozingTime\n");
+			bw.write("true/true/true/120000");
+			bw.flush();
+			bw.close();
+			fw.close();
+			
+			setIsTimeDefault(true);
+			setIs12HourFormat(true);
+			setIsDefaultSnoozingTime(true);
+			setSnoozingTime(120000);
+		}
+		catch(IOException e){
+			e.printStackTrace();
+			return;
+		}
+	}
+	
 	public void checkClockSettings() {
+		createClockSettingsFile();
+		
 		try{
 			File file = new File("src/classes/ClockSettings.txt");
-			if(!file.exists()){
-				file.createNewFile();
-				System.out.println("ClockSettings.txt has been created successfully");
-				FileWriter fw = new FileWriter(file);
-				fw.write("isTimeDefault/is12HourFormat/isDefaultSnoozingTime/snoozingTime\n");
-				fw.write("true/true/true/120000");
-				fw.close();
-				
-				setIsTimeDefault(true);
-				setIs12HourFormat(true);
-				setIsDefaultSnoozingTime(true);
-				setSnoozingTime(120000);
-			}
-			else{
-				System.out.println("ClockSettings.txt already exists");
-				FileReader fr = new FileReader(file);
-				BufferedReader br = new BufferedReader(fr);
-				
-				br.readLine(); // Read and ignore the first line (column names)
-				String secondLine = br.readLine(); // Read the settings in the second line
-				
-				if(secondLine != null && !secondLine.trim().isEmpty()){ // Check if second line is not null or empty
-					String[] settings = secondLine.split("/"); // Store the settings in the second line into this array
-					if(settings.length == 4){
-						setIsTimeDefault(Boolean.parseBoolean(settings[0]));
-						setIs12HourFormat(Boolean.parseBoolean(settings[1]));
-						setIsDefaultSnoozingTime(Boolean.parseBoolean(settings[2]));
-						setSnoozingTime(Integer.parseInt(settings[3]));
-					}
-					else{
-						System.out.println("Error: Invalid settings format in ClockSettings.txt");
-						System.exit(0);
-					}	
+			FileReader fr = new FileReader(file);
+			BufferedReader br = new BufferedReader(fr);
+
+			br.readLine(); // Read and ignore the first line (column names)
+			String secondLine = br.readLine(); // Read the settings in the second line
+
+			if(secondLine != null && !secondLine.trim().isEmpty()){ // Check if second line is not null or empty
+				String[] settings = secondLine.split("/"); // Store the settings in the second line into this array
+				if(settings.length == 4){
+					setIsTimeDefault(Boolean.parseBoolean(settings[0]));
+					setIs12HourFormat(Boolean.parseBoolean(settings[1]));
+					setIsDefaultSnoozingTime(Boolean.parseBoolean(settings[2]));
+					setSnoozingTime(Integer.parseInt(settings[3]));
 				}
 				else{
-					System.out.println("Error: No settings found in ClockSettings.txt");
+					System.out.println("Error: Invalid settings format in ClockSettings.txt");
 					System.exit(0);
-				}
-				br.close();
-				fr.close();
+				}	
 			}
+			else{
+				System.out.println("Error: No settings found in ClockSettings.txt");
+				System.exit(0);
+			}
+			br.close();
+			fr.close();
 		}
 		catch(IOException e){
 			e.printStackTrace();
 		}
+	}
+	
+	public void saveClockSettingsToFile(){
+		createClockSettingsFile();
+		try{
+			File file = new File("src/classes/ClockSettings.txt");
+			FileWriter fw = new FileWriter(file, false); // Default mode: Overwrite the whole file
+			BufferedWriter bw = new BufferedWriter(fw);
+			
+			String isTimeDefaultStr = String.valueOf(isTimeDefault);
+			String is12HourFormatStr = String.valueOf(is12HourFormat);
+			String isDefaultSnoozingTimeStr = String.valueOf(Time.isDefaultSnoozingTime);
+			String snoozingTimeStr = String.valueOf(snoozingTime);
+			
+			// Write the header first
+			bw.write("isTimeDefault/is12HourFormat/isDefaultSnoozingTime/snoozingTime\n");
+			bw.write(String.join("/", isTimeDefaultStr, is12HourFormatStr, isDefaultSnoozingTimeStr, snoozingTimeStr));
+			bw.flush();
+			bw.close();
+			fw.close();
+		}
+		catch(IOException e){
+			e.printStackTrace();
+		}
+		System.out.println("Clock Settings Successfully Saved to File!");
 	}
 }

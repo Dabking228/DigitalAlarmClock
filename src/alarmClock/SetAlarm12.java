@@ -1,6 +1,5 @@
 package alarmClock;
 
-import runAlarmClock.RunAlarmClock;
 import classes.Time24;
 import classes.Time12;
 import java.awt.event.ItemEvent;
@@ -308,48 +307,47 @@ public class SetAlarm12 extends javax.swing.JFrame {
     private void cancelBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelBtnActionPerformed
         // TODO add your handling code here:
 		dispose();
-		RunAlarmClock.AlarmClock.setVisible(true);			
+		new AlarmClock().setVisible(true);
+//		RunAlarmClock.AlarmClock.setVisible(true);			
     }//GEN-LAST:event_cancelBtnActionPerformed
 
     private void setAlarmBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setAlarmBtnActionPerformed
         // TODO add your handling code here:
+		String confirmSelectedDays = getConfirmSelectedDays();
+		// If no days has been selected / checked
+		if(confirmSelectedDays.isBlank()){ // Can be enhanced to accept this scenario
+			JOptionPane.showMessageDialog(this, "Please select at least one day", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
 		String hour = (String) setAlarmHour.getSelectedItem();
 		String minute = (String) setAlarmMinute.getSelectedItem();
 		String am_pm = (String) setAlarmAmPm.getSelectedItem();
-		String confirmSelectedDays = getConfirmSelectedDays();
-		
-		ArrayList<ArrayList<String>> alarms12 = time12.getAlarms12();
-		boolean alarmExistsInactive = false;
-		
-		for (ArrayList<String> alarm12 : alarms12) {
-			/* Check AM_PM first to reduce unnecessary checking if the hour, minute, selected days and status
-			are the same but different in AM and PM */
-			if(am_pm.equals(alarm12.get(2)) && hour.equals(alarm12.get(0)) && minute.equals(alarm12.get(1)) 
-			   && confirmSelectedDays.equals(alarm12.get(3)) && "Inactive".equals(alarm12.get(4))){
-				alarmExistsInactive = true;
-				alarm12.set(4, "Active"); // Update the status of the existing alarm in 12-Hour Format to Active
-				break;	
-			}
-		}
-		
 		String hour24 = time12.convert12To24(hour, am_pm); // Convert hour to 24-Hour Format
-
-		if(alarmExistsInactive){ // Update the status of the existing alarm in 24-Hour Format to Active
-			ArrayList<ArrayList<String>> alarms24 = time24.getAlarms24();
-			for(ArrayList<String> alarm24 : alarms24){
-				if(hour24.equals(alarm24.get(0)) && minute.equals(alarm24.get(1))
-				   && confirmSelectedDays.equals(alarm24.get(2)) && "Inactive".equals(alarm24.get(3))){
-					alarm24.set(3, "Active");
-					break;
-				}
+		
+		ArrayList<String> existingAlarm12 = time12.findExistingAlarm12(hour, minute, am_pm, confirmSelectedDays);
+		
+		if(existingAlarm12 != null){
+			ArrayList<String> existingAlarm24 = time24.findExistingAlarm24(hour24, minute, confirmSelectedDays);
+			
+			// To cater for scenario: The status is changed manually in the text file
+			if("Active".equals(existingAlarm12.get(4)) && "Active".equals(existingAlarm24.get(3))){
+				JOptionPane.showMessageDialog(this, "Existing Alarm Is Already Active!");
 			}
-			JOptionPane.showMessageDialog(this, "Existing Alarm is Set to Active!");
+			else{
+				// Update the status of the existing alarm in 12-Hour Format to Active
+				existingAlarm12.set(4, "Active");
+				// Update the status of the existing alarm in 24-Hour Format to Active
+				time24.updateAlarm24Status(hour24, minute, confirmSelectedDays);
+				JOptionPane.showMessageDialog(this, "Existing Alarm Is Set To Active!");
+			}
 		}
 		else{
 			time12.addAlarm12(hour, minute, am_pm, confirmSelectedDays, "Active");
 			time24.addAlarm24(hour24, minute, confirmSelectedDays, "Active");
 			JOptionPane.showMessageDialog(this, "Alarm Set!");
 		}
+		
 		time12.saveAlarmsToFile();
 		time24.saveAlarmsToFile();
 		resetFields();
@@ -366,7 +364,8 @@ public class SetAlarm12 extends javax.swing.JFrame {
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
 		dispose();
-		RunAlarmClock.AlarmClock.setVisible(true);
+		new AlarmClock().setVisible(true);
+//		RunAlarmClock.AlarmClock.setVisible(true);
     }//GEN-LAST:event_formWindowClosing
 
     private void setEverydayBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setEverydayBtnActionPerformed
@@ -388,38 +387,38 @@ public class SetAlarm12 extends javax.swing.JFrame {
 	/**
 	 * @param args the command line arguments
 	 */
-	public static void main(String args[]) {
-		/* Set the Nimbus look and feel */
-		//<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-		/* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-		 */
-		try {
-			for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-				if ("Nimbus".equals(info.getName())) {
-					javax.swing.UIManager.setLookAndFeel(info.getClassName());
-					break;
-				}
-			}
-		} catch (ClassNotFoundException ex) {
-			java.util.logging.Logger.getLogger(SetAlarm12.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-		} catch (InstantiationException ex) {
-			java.util.logging.Logger.getLogger(SetAlarm12.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-		} catch (IllegalAccessException ex) {
-			java.util.logging.Logger.getLogger(SetAlarm12.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-		} catch (javax.swing.UnsupportedLookAndFeelException ex) {
-			java.util.logging.Logger.getLogger(SetAlarm12.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-		}
-		//</editor-fold>
-		//</editor-fold>
-
-		/* Create and display the form */
-		java.awt.EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				new SetAlarm12().setVisible(true);
-			}
-		});
-	}
+//	public static void main(String args[]) {
+//		/* Set the Nimbus look and feel */
+//		//<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+//		/* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+//		 */
+//		try {
+//			for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//				if ("Nimbus".equals(info.getName())) {
+//					javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//					break;
+//				}
+//			}
+//		} catch (ClassNotFoundException ex) {
+//			java.util.logging.Logger.getLogger(SetAlarm12.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//		} catch (InstantiationException ex) {
+//			java.util.logging.Logger.getLogger(SetAlarm12.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//		} catch (IllegalAccessException ex) {
+//			java.util.logging.Logger.getLogger(SetAlarm12.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//		} catch (javax.swing.UnsupportedLookAndFeelException ex) {
+//			java.util.logging.Logger.getLogger(SetAlarm12.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//		}
+//		//</editor-fold>
+//		//</editor-fold>
+//
+//		/* Create and display the form */
+//		java.awt.EventQueue.invokeLater(new Runnable() {
+//			public void run() {
+//				new SetAlarm12().setVisible(true);
+//			}
+//		});
+//	}
 	
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

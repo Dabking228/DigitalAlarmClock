@@ -14,7 +14,7 @@ import java.util.GregorianCalendar;
 public class Time12 extends Time implements ClockFunctions{
 	private static int hour12;
 	private static int am_pm;
-	private ArrayList<ArrayList<String>> alarms12 = new ArrayList<>();
+	private static ArrayList<ArrayList<String>> alarms12 = new ArrayList<>();
 	
 //	GregorianCalendar calendar = new GregorianCalendar();
 	
@@ -131,6 +131,21 @@ E.g., at 10:04:15.250 PM the HOUR is 10.
 	@Override
 	public void readAlarms(){
 		createAlarms12File(); // If Alarm12HourFormat.txt exists in the folder then nothing will be done
+		
+		// Clear each inner list first before removing their references
+		alarms12.forEach(ArrayList::clear); // Using method reference "::" 
+		// alarms12.forEach(innerList -> innerList.clear()); // Using lambda expression
+		
+		// Then, clear outer list.
+		alarms12.clear();
+		/* If only clearing outer list, the inner lists still exist in memory if something else is referencing them
+		This could cause memory leaks and unwanted behaviour */
+		/* If there are no other references to the inner lists elsewhere in the program, Java's garbage 
+		collector (GC) will automatically remove them.
+		However, if another part of the program still holds references to any of the inner lists, they will 
+		persist in memory.
+		*/
+		
 		try{
 			File file = new File("src/classes/Alarm12HourFormat.txt");
 			FileReader fr = new FileReader(file);
@@ -151,7 +166,6 @@ E.g., at 10:04:15.250 PM the HOUR is 10.
 					System.out.println("Error: Invalid alarm format in Alarm12HourFormat.txt");
 					System.exit(0); // Possible Enhancement: Can automatically delete the alarm
 				}
-				
 			}
 		}
 		catch(IOException e){
@@ -167,9 +181,12 @@ E.g., at 10:04:15.250 PM the HOUR is 10.
 		createAlarms12File(); // If Alarm12HourFormat.txt exists in the folder then nothing will be done
 		try{
 			File file = new File("src/classes/Alarm12HourFormat.txt");
-			FileWriter fw = new FileWriter(file);
+			FileWriter fw = new FileWriter(file, false); // Default mode: Overwrite the whole file
 			BufferedWriter bw = new BufferedWriter(fw);
 			PrintWriter pw = new PrintWriter(bw);
+			
+			// Write the header first
+			pw.println("Hour12/Minute/Am_pm/Days/Status");
 			
 			for(ArrayList<String> alarm12 : alarms12){
 				pw.println(String.join("/", alarm12));
@@ -182,5 +199,26 @@ E.g., at 10:04:15.250 PM the HOUR is 10.
 			e.printStackTrace();
 		}
 		System.out.println("Alarm Successfully Saved to File!");
+	}
+	
+	public ArrayList<String> findExistingAlarm12(String hour, String minute, String am_pm, String days) {
+		for (ArrayList<String> alarm12 : alarms12) {
+			/* Check AM_PM first to reduce unnecessary checking if the hour, minute, selected days and status
+			are the same but different in AM and PM */
+			if (am_pm.equals(alarm12.get(2)) && hour.equals(alarm12.get(0)) && minute.equals(alarm12.get(1)) && days.equals(alarm12.get(3))) {
+				return alarm12;
+			}
+		}
+		return null;
+	}
+	
+	public void updateAlarm12Status(String hour12, String minute, String am_pm, String days){
+		for(ArrayList<String> alarm12 : alarms12){
+			if(am_pm.equals(alarm12.get(2)) && hour12.equals(alarm12.get(0)) && minute.equals(alarm12.get(1)) 
+			&& days.equals(alarm12.get(3))){
+				alarm12.set(4, "Active");
+				return;
+			}
+		}
 	}
 }

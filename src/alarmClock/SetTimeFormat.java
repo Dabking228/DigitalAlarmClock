@@ -6,7 +6,6 @@ import javax.swing.JOptionPane;
 
 public class SetTimeFormat extends javax.swing.JFrame {
 	Time time = new Time();
-	
 	/**
 	 * Creates new form SetTimeFormat
 	 */
@@ -162,7 +161,7 @@ public class SetTimeFormat extends javax.swing.JFrame {
     private void cancelBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelBtnActionPerformed
         // TODO add your handling code here:
         dispose();
-        RunAlarmClock.AlarmClock.setVisible(true);
+        new AlarmClock().setVisible(true);
     }//GEN-LAST:event_cancelBtnActionPerformed
 
     private void setTimeFormatBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setTimeFormatBtnActionPerformed
@@ -171,23 +170,22 @@ public class SetTimeFormat extends javax.swing.JFrame {
 		
 		if("12-Hour Format".equals(selectedTimeFormat)){
 			time.setIs12HourFormat(true);
-			JOptionPane.showMessageDialog(this, "Time Format Set!");
-			dispose();
-			RunAlarmClock.AlarmClock.setVisible(true);
 			
 		}
 		else{
 			time.setIs12HourFormat(false);
-			JOptionPane.showMessageDialog(this, "Time Format Set!");
-			dispose();
-			RunAlarmClock.AlarmClock.setVisible(true);
 		}
+		time.saveClockSettingsToFile();
+		JOptionPane.showMessageDialog(this, "Time Format Set!");
+		dispose();
+		new AlarmClock().setVisible(true);
+//		RunAlarmClock.AlarmClock.setVisible(true);
     }//GEN-LAST:event_setTimeFormatBtnActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
 		dispose();
-		RunAlarmClock.AlarmClock.setVisible(true);
+		new AlarmClock().setVisible(true);
     }//GEN-LAST:event_formWindowClosing
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened

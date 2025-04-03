@@ -1,20 +1,34 @@
 package alarmClock;
 
-import runAlarmClock.RunAlarmClock;
 import classes.Time24;
 import classes.Time12;
+import java.awt.event.ItemEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 
-
 public class SetAlarm24 extends javax.swing.JFrame {
-
+	Time12 time12 = new Time12();
+	Time24 time24 = new Time24();
+	
+	// Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday
+	private boolean [] selectedDays = {false, false, false, false, false, false, false};
+	private boolean updatingFromSetEverydayBtn = false;
+	private List<JCheckBox> daysCheckBoxes;
 	/**
-	 * Creates new form SetAlarm24
+	 * Creates new form SetAlarm
 	 */
 	public SetAlarm24() {
 		initComponents();
-//		setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+		setLocationRelativeTo(null);
+		setResizable(false);
+		initializeDaysCheckBoxes();
+//		addCheckBoxListenersForEverydayBtn(); Replaced with addCheckBoxListenersForItemStateChanged();
+		addCheckBoxListenersForItemStateChanged();
+		
+		setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
 	}
 
 	/**
@@ -30,10 +44,19 @@ public class SetAlarm24 extends javax.swing.JFrame {
         title = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         currentTimeFormat = new javax.swing.JLabel();
+        jPanel5 = new javax.swing.JPanel();
+        mondayCheckBox = new javax.swing.JCheckBox();
+        tuesdayCheckBox = new javax.swing.JCheckBox();
+        wednesdayCheckBox = new javax.swing.JCheckBox();
+        thursdayCheckBox = new javax.swing.JCheckBox();
+        fridayCheckBox = new javax.swing.JCheckBox();
+        saturdayCheckBox = new javax.swing.JCheckBox();
+        sundayCheckBox = new javax.swing.JCheckBox();
+        setEverydayBtn = new javax.swing.JToggleButton();
         jPanel4 = new javax.swing.JPanel();
-        setAlarmHour = new javax.swing.JComboBox<>();
-        jLabel1 = new javax.swing.JLabel();
         setAlarmMinute = new javax.swing.JComboBox<>();
+        jLabel2 = new javax.swing.JLabel();
+        setAlarmHour = new javax.swing.JComboBox<>();
         jPanel3 = new javax.swing.JPanel();
         cancelBtn = new javax.swing.JButton();
         setAlarmBtn = new javax.swing.JButton();
@@ -76,37 +99,111 @@ public class SetAlarm24 extends javax.swing.JFrame {
         currentTimeFormat.setText("currentTimeFormat");
         currentTimeFormat.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
+        jPanel5.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
+        mondayCheckBox.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        mondayCheckBox.setText("Monday");
+
+        tuesdayCheckBox.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        tuesdayCheckBox.setText("Tuesday");
+
+        wednesdayCheckBox.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        wednesdayCheckBox.setText("Wednesday");
+
+        thursdayCheckBox.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        thursdayCheckBox.setText("Thursday");
+
+        fridayCheckBox.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        fridayCheckBox.setText("Friday");
+
+        saturdayCheckBox.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        saturdayCheckBox.setText("Saturday");
+
+        sundayCheckBox.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        sundayCheckBox.setText("Sunday");
+
+        setEverydayBtn.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        setEverydayBtn.setText("Every Day");
+        setEverydayBtn.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        setEverydayBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                setEverydayBtnActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addComponent(mondayCheckBox)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tuesdayCheckBox)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(wednesdayCheckBox)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(thursdayCheckBox)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(fridayCheckBox)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(saturdayCheckBox)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(sundayCheckBox))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(285, 285, 285)
+                        .addComponent(setEverydayBtn)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(sundayCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(saturdayCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(fridayCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(thursdayCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(wednesdayCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(tuesdayCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(mondayCheckBox, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(setEverydayBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
         jPanel4.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
-        setAlarmHour.setFont(new java.awt.Font("Arial", 1, 36)); // NOI18N
-
-        jLabel1.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
-        jLabel1.setText(":");
-
         setAlarmMinute.setFont(new java.awt.Font("Arial", 1, 36)); // NOI18N
+
+        jLabel2.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
+        jLabel2.setText(":");
+
+        setAlarmHour.setFont(new java.awt.Font("Arial", 1, 36)); // NOI18N
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                .addContainerGap(179, Short.MAX_VALUE)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGap(182, 182, 182)
                 .addComponent(setAlarmHour, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(setAlarmMinute, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(180, 180, 180))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(28, 28, 28)
+                .addGap(26, 26, 26)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(setAlarmMinute, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(setAlarmHour, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
-                .addContainerGap(34, Short.MAX_VALUE))
+                    .addComponent(jLabel2))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -115,13 +212,20 @@ public class SetAlarm24 extends javax.swing.JFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(currentTimeFormat, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addComponent(currentTimeFormat, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 86, Short.MAX_VALUE)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel2Layout.createSequentialGroup()
+                    .addGap(28, 28, 28)
+                    .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(118, Short.MAX_VALUE)))
         );
 
         jPanel3.setPreferredSize(new java.awt.Dimension(550, 99));
@@ -158,7 +262,7 @@ public class SetAlarm24 extends javax.swing.JFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cancelBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(setAlarmBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -166,10 +270,10 @@ public class SetAlarm24 extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(239, 239, 239)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 332, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(239, 239, 239))
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addGap(62, 62, 62)
@@ -180,14 +284,14 @@ public class SetAlarm24 extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(264, 264, 264)
-                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(27, 27, 27))
+                .addGap(285, 285, 285)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(27, Short.MAX_VALUE))
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
-                    .addGap(153, 153, 153)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(153, Short.MAX_VALUE)))
+                    .addGap(123, 123, 123)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(112, Short.MAX_VALUE)))
         );
 
         pack();
@@ -195,102 +299,149 @@ public class SetAlarm24 extends javax.swing.JFrame {
 
     private void cancelBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelBtnActionPerformed
         // TODO add your handling code here:
-        dispose();
-        RunAlarmClock.AlarmClock.setVisible(true);
+		dispose();
+		new AlarmClock().setVisible(true);
+//		RunAlarmClock.AlarmClock.setVisible(true);			
     }//GEN-LAST:event_cancelBtnActionPerformed
+
+    private void setAlarmBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setAlarmBtnActionPerformed
+        // TODO add your handling code here:
+		String confirmSelectedDays = getConfirmSelectedDays();
+		// If no days has been selected / checked
+		if(confirmSelectedDays.isBlank()){ // Can be enhanced to accept this scenario
+			JOptionPane.showMessageDialog(this, "Please select at least one day", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		String hour = (String) setAlarmHour.getSelectedItem();
+		String minute = (String) setAlarmMinute.getSelectedItem();
+		ArrayList<String> convertedTime12 = time24.convert24To12(hour); // Convert hour to 24-Hour Format
+		String hour12 = convertedTime12.get(0);
+		String am_pm = convertedTime12.get(1);
+		
+		ArrayList<String> existingAlarm24 = time24.findExistingAlarm24(hour, minute, confirmSelectedDays);
+		
+		if(existingAlarm24 != null){
+			ArrayList<String> existingAlarm12 = time12.findExistingAlarm12(hour12, minute, am_pm, confirmSelectedDays);
+			
+			// To cater for scenario: The status is changed manually in the text file
+			if("Active".equals(existingAlarm24.get(3)) && "Active".equals(existingAlarm12.get(4))){
+				JOptionPane.showMessageDialog(this, "Existing Alarm Is Already Active!");
+			}
+			else{
+				// Update the status of the existing alarm in 24-Hour Format to Active
+				existingAlarm24.set(3, "Active");
+				// Update the status of the existing alarm in 12-Hour Format to Active
+				time12.updateAlarm12Status(hour12, minute, am_pm, confirmSelectedDays);
+				JOptionPane.showMessageDialog(this, "Existing Alarm Is Set To Active!");
+			}
+		}
+		else{
+			time24.addAlarm24(hour, minute, confirmSelectedDays, "Active");
+			time12.addAlarm12(hour12, minute, am_pm, confirmSelectedDays, "Active");
+			JOptionPane.showMessageDialog(this, "Alarm Set!");
+		}
+		
+		time12.saveAlarmsToFile();
+		time24.saveAlarmsToFile();
+		resetFields();
+    }//GEN-LAST:event_setAlarmBtnActionPerformed
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         // TODO add your handling code here:
+		currentTimeFormat.setText("24-Hour Format");
 		setAlarmHour.requestFocusInWindow();
 		displayHours();
 		displayMinutes();
     }//GEN-LAST:event_formWindowOpened
 
-    private void setAlarmBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setAlarmBtnActionPerformed
-        // TODO add your handling code here:
-		String hour = (String) setAlarmHour.getSelectedItem();
-		String minute = (String) setAlarmMinute.getSelectedItem();
-		
-		Time24 time24 = new Time24();
-		ArrayList<ArrayList<String>> alarms24 = time24.getAlarms24();
-		boolean alarmExists = false;
-		
-		for (ArrayList<String> alarm24 : alarms24) {
-			if(hour.equals(alarm24.get(0)) && minute.equals(alarm24.get(1))){
-				alarmExists = true;
-				break;	
-			}
-		}
-		
-		if(alarmExists){
-			JOptionPane.showMessageDialog(this, "Alarm already exists!", "Error", JOptionPane.ERROR_MESSAGE);
-		}
-		else{
-			time24.addAlarm24(hour, minute);
-			Time12 time12 = new Time12();
-			ArrayList<String> str_time12 = time24.convert24To12(hour);
-			time12.addAlarm12(str_time12.get(0), minute, str_time12.get(1));
-			JOptionPane.showMessageDialog(this, "Alarm Set!");
-		}
-    }//GEN-LAST:event_setAlarmBtnActionPerformed
-
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
-//		dispose();
+		dispose();
+		new AlarmClock().setVisible(true);
 //		RunAlarmClock.AlarmClock.setVisible(true);
     }//GEN-LAST:event_formWindowClosing
 
+    private void setEverydayBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setEverydayBtnActionPerformed
+        // TODO add your handling code here:
+		updatingFromSetEverydayBtn = true; // Disable individual checkbox itemStateChanged listeners
+		
+		// Check whether setEverydayBtn is toggled on or off and update accordingly
+		boolean checkAllCheckBoxes = setEverydayBtn.isSelected();
+		daysCheckBoxes.forEach(checkbox -> checkbox.setSelected(checkAllCheckBoxes));
+		
+		// Update selectedDays array
+		// Use fill to update all elements in the array
+		Arrays.fill(selectedDays, checkAllCheckBoxes); 
+		
+		updatingFromSetEverydayBtn = false; // Re-enable individual checkbox itemStateChanged listeners
+		System.out.println(Arrays.toString(selectedDays));
+    }//GEN-LAST:event_setEverydayBtnActionPerformed
+/**/
 	/**
 	 * @param args the command line arguments
 	 */
-	public static void main(String args[]) {
-		/* Set the Nimbus look and feel */
-		//<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-		/* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-		 */
-		try {
-			for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-				if ("Nimbus".equals(info.getName())) {
-					javax.swing.UIManager.setLookAndFeel(info.getClassName());
-					break;
-				}
-			}
-		}
-		catch (ClassNotFoundException ex) {
-			java.util.logging.Logger.getLogger(SetAlarm24.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-		}
-		catch (InstantiationException ex) {
-			java.util.logging.Logger.getLogger(SetAlarm24.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-		}
-		catch (IllegalAccessException ex) {
-			java.util.logging.Logger.getLogger(SetAlarm24.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-		}
-		catch (javax.swing.UnsupportedLookAndFeelException ex) {
-			java.util.logging.Logger.getLogger(SetAlarm24.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-		}
-		//</editor-fold>
-
-		/* Create and display the form */
-		java.awt.EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				new SetAlarm24().setVisible(true);
-			}
-		});
-	}
+//	public static void main(String args[]) {
+//		/* Set the Nimbus look and feel */
+//		//<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+//		/* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+//		 */
+//		try {
+//			for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//				if ("Nimbus".equals(info.getName())) {
+//					javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//					break;
+//				}
+//			}
+//		} catch (ClassNotFoundException ex) {
+//			java.util.logging.Logger.getLogger(SetAlarm24.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//		} catch (InstantiationException ex) {
+//			java.util.logging.Logger.getLogger(SetAlarm24.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//		} catch (IllegalAccessException ex) {
+//			java.util.logging.Logger.getLogger(SetAlarm24.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//		} catch (javax.swing.UnsupportedLookAndFeelException ex) {
+//			java.util.logging.Logger.getLogger(SetAlarm24.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//		}
+//		//</editor-fold>
+//		//</editor-fold>
+//		//</editor-fold>
+//		//</editor-fold>
+//		//</editor-fold>
+//		//</editor-fold>
+//		//</editor-fold>
+//		//</editor-fold>
+//
+//		/* Create and display the form */
+//		java.awt.EventQueue.invokeLater(new Runnable() {
+//			public void run() {
+//				new SetAlarm24().setVisible(true);
+//			}
+//		});
+//	}
+	
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelBtn;
     private javax.swing.JLabel currentTimeFormat;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JCheckBox fridayCheckBox;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JCheckBox mondayCheckBox;
+    private javax.swing.JCheckBox saturdayCheckBox;
     private javax.swing.JButton setAlarmBtn;
     private javax.swing.JComboBox<String> setAlarmHour;
     private javax.swing.JComboBox<String> setAlarmMinute;
+    private javax.swing.JToggleButton setEverydayBtn;
+    private javax.swing.JCheckBox sundayCheckBox;
+    private javax.swing.JCheckBox thursdayCheckBox;
     private javax.swing.JLabel title;
+    private javax.swing.JCheckBox tuesdayCheckBox;
+    private javax.swing.JCheckBox wednesdayCheckBox;
     // End of variables declaration//GEN-END:variables
 
 	private void displayHours(){
@@ -306,4 +457,78 @@ public class SetAlarm24 extends javax.swing.JFrame {
 			setAlarmMinute.addItem(minute);
 		}
 	}
+	
+	private void initializeDaysCheckBoxes(){
+		daysCheckBoxes = Arrays.asList(mondayCheckBox, tuesdayCheckBox, wednesdayCheckBox,
+						thursdayCheckBox, fridayCheckBox, saturdayCheckBox, sundayCheckBox);
+	}
+	
+	private void resetFields(){
+		setAlarmHour.setSelectedIndex(0);
+		setAlarmMinute.setSelectedIndex(0);
+		
+		updatingFromSetEverydayBtn = true;
+		daysCheckBoxes.forEach(checkbox -> checkbox.setSelected(false));
+		Arrays.fill(selectedDays, false);
+		
+		setEverydayBtn.setSelected(false);
+		updatingFromSetEverydayBtn = false;
+		System.out.println(Arrays.toString(selectedDays));
+	}
+	
+	private void eachDayCheckBoxItemStateChanged(java.awt.event.ItemEvent evt, int index){
+		if(updatingFromSetEverydayBtn == false){
+			selectedDays[index] = (evt.getStateChange() == ItemEvent.SELECTED);
+			// Return true or false
+			// SELECTED = 1
+			// DESELECTED = 2
+			System.out.println(Arrays.toString(selectedDays));
+			
+			if(selectedDays[index] == false){
+				setEverydayBtn.setSelected(false);
+			}
+			else{
+				setEverydayBtn.setSelected(isAllChecked());
+			}
+		}
+	}
+	
+	private boolean isAllChecked(){
+		boolean allChecked = true;
+		for(boolean isChecked : selectedDays){
+			if(isChecked == false){
+				allChecked = false;
+				break;
+			}
+		}
+		return allChecked;
+	}
+	
+	private void addCheckBoxListenersForItemStateChanged(){
+		for(int i = 0; i < daysCheckBoxes.size(); i++){
+			/* Java lambdas capture variables by reference, not value.
+			The loop continues running, changing i, but the lambda holds a reference to the
+			final variable index, ensuring it captures the correct value.
+			*/
+			final int index = i;
+			daysCheckBoxes.get(i).addItemListener(e -> eachDayCheckBoxItemStateChanged(e, index));
+		}
+	}
+	
+	
+	private String getConfirmSelectedDays(){
+		String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+		List<String> confirmSelectedDays = new ArrayList<>();
+		for(int i = 0; i < days.length; i++){
+			if(selectedDays[i]){ // selectedDays[i] == true
+				confirmSelectedDays.add(days[i]);
+			}
+		}
+		
+		return String.join(", ", confirmSelectedDays);
+	}
+	
+
+
+	
 }

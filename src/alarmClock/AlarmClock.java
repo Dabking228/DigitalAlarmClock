@@ -6,7 +6,8 @@ import javax.swing.Timer;
 
 public class AlarmClock extends javax.swing.JFrame {
 	protected static SetTimeFormat SetTimeFormat;
-	static SetAlarm12 SetAlarm12;
+	protected static SetAlarm12 SetAlarm12;
+	protected static SetAlarm24 SetAlarm24;
 	
 	Time time = new Time(); // Create only one Time object
 	Time12 time12 = new Time12(); // 12-Hour Format
@@ -20,9 +21,12 @@ public class AlarmClock extends javax.swing.JFrame {
 		setLocationRelativeTo(null);
 		setResizable(false);
 		time.checkClockSettings();
+		time12.readAlarms();
+		time24.readAlarms();
+		System.out.println(time12.getAlarms12());
+		System.out.println(time24.getAlarms24());
 		
 		Timer timer = new Timer(0000, (ActionEvent e) -> {
-			
 			if(time.getIs12HourFormat() == true){
 				// Update the current time by getting the latest hour, minute, second and AM/PM
 				time12.updateCurrentTime(); 
@@ -258,8 +262,14 @@ public class AlarmClock extends javax.swing.JFrame {
     private void setAlarmBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setAlarmBtnActionPerformed
         // TODO add your handling code here:
 		dispose();
-		AlarmClock.SetAlarm12 = new SetAlarm12();
-		AlarmClock.SetAlarm12.setVisible(true);
+		if(time.getIs12HourFormat()){
+			AlarmClock.SetAlarm12 = new SetAlarm12();
+			AlarmClock.SetAlarm12.setVisible(true);
+		}
+		else{
+			AlarmClock.SetAlarm24 = new SetAlarm24();
+			AlarmClock.SetAlarm24.setVisible(true);
+		}
     }//GEN-LAST:event_setAlarmBtnActionPerformed
 
     private void setSnoozingTimeBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setSnoozingTimeBtnActionPerformed
